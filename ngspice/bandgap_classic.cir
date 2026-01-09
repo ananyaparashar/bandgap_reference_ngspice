@@ -1,0 +1,32 @@
+* CLASSIC BANDGAP REFERENCE - 1.25V OUTPUT
+.TEMP 27
+.OPTIONS ABSTOL=1e-12 RELTOL=1e-6
+
+VDD VDD 0 DC 3.3
+
+* Classic bandgap configuration with op-amp
+Q1 N1 N1 0 QNPN 1
+Q2 N2 N1 0 QNPN 8
+
+* Equal currents through both branches
+R1 VDD N3 12K
+R2 VDD N4 12K
+
+* Op-amp to force V(N3) = V(N4)
+EOPAMP N5 0 N4 N3 1e6
+
+* Current mirror
+M1 N3 N5 VDD VDD PMOS W=20U L=1U
+M2 N4 N5 VDD VDD PMOS W=20U L=1U
+
+* Bandgap output - THIS is the key difference
+R3 N4 VBGR 8K
+R4 VBGR 0 4K
+
+.MODEL QNPN NPN(IS=1E-16 BF=100)
+.MODEL PMOS PMOS (VTO=-0.7 KP=50U LAMBDA=0.05)
+
+.DC TEMP -40 125 5
+.PRINT DC V(VBGR) V(N3) V(N4)
+
+.END
